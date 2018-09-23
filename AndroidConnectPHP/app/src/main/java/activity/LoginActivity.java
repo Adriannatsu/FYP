@@ -10,9 +10,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.Response;
+import com.android.volley.ServerError;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.StringRequest;
 import com.example.user.androidconnectphp.MainActivity;
 import com.example.user.androidconnectphp.R;
@@ -20,6 +23,7 @@ import com.example.user.androidconnectphp.R;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,7 +33,6 @@ import helper.SQLiteHandler;
 import helper.SessionManager;
 
 public class LoginActivity extends Activity {
-
     private static final String TAG = RegisterActivity.class.getSimpleName();
     private Button btnLogin;
     private Button btnLinkToRegister;
@@ -40,46 +43,60 @@ public class LoginActivity extends Activity {
     private SQLiteHandler db;
 
     @Override
-    public void onCreate(Bundle savedInstanceState){
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        inputEmail = findViewById(R.id.email);
-        inputPassword = findViewById(R.id.password);
-        btnLogin= findViewById(R.id.btnLogin);
-        btnLinkToRegister = findViewById(R.id.btnLinkToRegisterScreen);
+        inputEmail = (EditText) findViewById(R.id.email);
+        inputPassword = (EditText) findViewById(R.id.password);
+        btnLogin = (Button) findViewById(R.id.btnLogin);
+        btnLinkToRegister = (Button) findViewById(R.id.btnLinkToRegisterScreen);
 
+        // Progress dialog
         pDialog = new ProgressDialog(this);
         pDialog.setCancelable(false);
 
+        // SQLite database handler
         db = new SQLiteHandler(getApplicationContext());
 
+        // Session manager
         session = new SessionManager(getApplicationContext());
 
-        if(session.isLoggedIn()){
+        // Check if user is already logged in or not
+        if (session.isLoggedIn()) {
+            // User is already logged in. Take him to main activity
             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
             startActivity(intent);
             finish();
         }
 
-        btnLogin.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View view){
+        // Login button Click Event
+        btnLogin.setOnClickListener(new View.OnClickListener() {
+
+            public void onClick(View view) {
                 String email = inputEmail.getText().toString().trim();
                 String password = inputPassword.getText().toString().trim();
 
-                if(!email.isEmpty() && !password.isEmpty()){
+                // Check for empty data in the form
+                if (!email.isEmpty() && !password.isEmpty()) {
+                    // login user
                     checkLogin(email, password);
-                }else{
+                } else {
+                    // Prompt user to enter credentials
                     Toast.makeText(getApplicationContext(),
-                    "Please enter the credentials!", Toast.LENGTH_LONG).show();
+                            "Please enter the credentials!", Toast.LENGTH_LONG)
+                            .show();
                 }
             }
+
         });
 
-        btnLinkToRegister.setOnClickListener(new View.OnClickListener(){
+        // Link to Register Screen
+        btnLinkToRegister.setOnClickListener(new View.OnClickListener() {
 
-            public void onClick(View view){
-                Intent i = new Intent(getApplicationContext(), RegisterActivity.class);
+            public void onClick(View view) {
+                Intent i = new Intent(getApplicationContext(),
+                        RegisterActivity.class);
                 startActivity(i);
                 finish();
             }
@@ -87,7 +104,9 @@ public class LoginActivity extends Activity {
 
     }
 
-
+    /**
+     * function to verify login details in mysql db
+     * */
     private void checkLogin(final String email, final String password) {
         // Tag used to cancel the request
         String tag_string_req = "req_login";
@@ -100,7 +119,7 @@ public class LoginActivity extends Activity {
 
             @Override
             public void onResponse(String response) {
-                Log.d(TAG, "Login Response: " + response.toString());
+                Log.d(TAG, "Login Response: ");
                 hideDialog();
 
                 try {
@@ -147,6 +166,19 @@ public class LoginActivity extends Activity {
 
             @Override
             public void onErrorResponse(VolleyError error) {
+
+                NetworkResponse response = error.networkResponse;
+                if(error instanceof ServerError && response != null){
+                    try{
+                        String res = new String (response.data,
+                                HttpHeaderParser.parseCharset(response.headers, "utf-8"));
+                        JSONObject obj = new JSONObject(res);
+                    }catch (UnsupportedEncodingException e1){
+                        e1.printStackTrace();
+                    }catch (JSONException e2){
+                        e2.printStackTrace();
+                    }
+                }
                 Log.e(TAG, "Login Error: " + error.getMessage());
                 Toast.makeText(getApplicationContext(),
                         error.getMessage(), Toast.LENGTH_LONG).show();

@@ -29,7 +29,6 @@ import helper.SQLiteHandler;
 import helper.SessionManager;
 
 public class RegisterActivity extends Activity {
-
     private static final String TAG = RegisterActivity.class.getSimpleName();
     private Button btnRegister;
     private Button btnLinkToLogin;
@@ -45,11 +44,11 @@ public class RegisterActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        inputFullName = findViewById(R.id.name);
-        inputEmail =  findViewById(R.id.email);
-        inputPassword =  findViewById(R.id.password);
-        btnRegister =  findViewById(R.id.btnRegister);
-        btnLinkToLogin =  findViewById(R.id.btnLinkToLoginScreen);
+        inputFullName = (EditText) findViewById(R.id.name);
+        inputEmail = (EditText) findViewById(R.id.email);
+        inputPassword = (EditText) findViewById(R.id.password);
+        btnRegister = (Button) findViewById(R.id.btnRegister);
+        btnLinkToLogin = (Button) findViewById(R.id.btnLinkToLoginScreen);
 
         // Progress dialog
         pDialog = new ProgressDialog(this);
@@ -196,5 +195,3 @@ public class RegisterActivity extends Activity {
             pDialog.dismiss();
     }
 }
-
-
