@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Hamburgerr</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="show_snackbar">Click me</string>
+    <string name="err_msg_email">Enter valid email address</string>
+    <string name="err_msg_password">Enter the password</string>
+    <string name="log_in_fb">Log in using Facebook</string>
+    <string name="log_in_google">Log in using Google</string>
+</resources>

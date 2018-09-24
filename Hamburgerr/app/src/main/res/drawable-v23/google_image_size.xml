@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@id/btn_google"
+        android:drawable="@mipmap/google_logo"
+        android:width="4dp"
+        android:height="4dp"
+        />
+
+</selector>
